@@ -89,8 +89,9 @@ class ShapeDiffFinder:
         diffs_filename = 'tmp_diffs.txt'
 
         with open(diffs_filename, 'w') as ofile:
+            filename_index = 0
             for name in ordered_names:
-
+                print filename_index
                 # ignore null character, and characters without unicode values
                 unival = self.reverse_cmap.get(name, 0)
                 if unival == 0:
@@ -99,21 +100,26 @@ class ShapeDiffFinder:
                 strin = unichr(unival)
                 subprocess.call([
                     'hb-view', '--font-size=%d' % font_size,
-                    '--output-file=%s' % a_png, path_a, strin])
+                    '--output-file=%s' % str(filename_index) + a_png, path_a, strin])
                 subprocess.call([
                     'hb-view', '--font-size=%d' % font_size,
-                    '--output-file=%s' % b_png, path_b, strin])
+                    '--output-file=%s' % str(filename_index) + b_png, path_b, strin])
                 subprocess.call(
-                    ['compare', '-metric', 'AE', a_png, b_png, cmp_png],
-                    stderr=ofile)
+                    # This will write stderr errors to tmp_diffs.txt
+                    # ['compare', '-metric', 'AE', a_png, b_png, str(filename_index) + cmp_png],
+                    # stderr=ofile)
+                    ['compare', '-metric', 'AE', str(filename_index) + a_png, str(filename_index) + b_png, str(filename_index) + cmp_png])
+                    
+                print 'compare', '-metric', 'AE', str(filename_index) + a_png, str(filename_index) + b_png, str(filename_index) + cmp_png
+                filename_index += 1
 
         with open(diffs_filename) as ifile:
             diffs = ifile.readlines()
 
-        os.remove(a_png)
-        os.remove(b_png)
-        os.remove(cmp_png)
-        os.remove(diffs_filename)
+        # os.remove(a_png)
+        # os.remove(b_png)
+        # os.remove(cmp_png)
+        # os.remove(diffs_filename)
 
         mismatched = {}
         img_size_diffs = []

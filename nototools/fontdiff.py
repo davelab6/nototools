@@ -36,6 +36,7 @@ def shape(path_a, path_b, stats):
         path_a, path_b, output_lines=-1, ratio_diffs=True)
 
     diff_finder.find_area_diffs(cur_stats)
+    diff_finder.find_rendered_diffs(100)
 
     basename = os.path.basename(path_a)
     stats.extend(s[0:2] + (basename,) + s[2:] for s in cur_stats)
